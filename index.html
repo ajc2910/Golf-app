@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#0f2914" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Fairway Score" />
+  <title>Fairway Score</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    :root {
+      --bg: #0a1a0e;
+      --surface: #0c1f10;
+      --card: #111f14;
+      --border: #1e3825;
+      --border-hi: #3a7a40;
+      --green-dim: #4a7a50;
+      --green-mid: #6aaa6e;
+      --green-hi: #a3e4a0;
+      --green-bright: #4ade80;
+      --text: #e8f0e9;
+      --text-dim: #a3d4a0;
+      --good: #4ade80;
+      --good-bg: #052e16;
+      --avg: #fbbf24;
+      --avg-bg: #1c1005;
+      --poor: #f87171;
+      --poor-bg: #1c0505;
+    }
+
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overscroll-behavior: none; }
+
+    #root { height: 100%; }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100dvh;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* ── SCROLLABLE BODY ── */
+    .screen-body {
+      flex: 1;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 20px 20px calc(env(safe-area-inset-bottom) + 24px);
+    }
+
+    /* ── HEADER ── */
+    .header {
+      padding: calc(env(safe-area-inset-top) + 18px) 20px 16px;
+      background: linear-gradient(180deg, #0f2914 0%, var(--surface) 100%);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .header-title { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; letter-spacing: .06em; color: var(--green-hi); line-height: 1; }
+    .header-sub { font-size: .7rem; color: var(--green-dim); letter-spacing: .12em; text-transform: uppercase; margin-top: 3px; font-weight: 500; }
+
+    /* ── CARDS ── */
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 18px; margin-bottom: 14px; }
+    .card-title { font-family: 'Bebas Neue', sans-serif; font-size: .95rem; letter-spacing: .1em; color: var(--green-mid); margin-bottom: 14px; }
+
+    /* ── LABELS / INPUTS ── */
+    .label { display: block; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; color: var(--green-dim); font-weight: 600; margin-bottom: 7px; }
+    .input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 13px 14px; color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 1rem; outline: none; transition: border-color .2s; -webkit-appearance: none; }
+    .input:focus { border-color: var(--green-dim); }
+    .input-group { margin-bottom: 14px; }
+
+    /* ── SEGMENTED BUTTONS ── */
+    .seg-row { display: flex; gap: 8px; }
+    .seg-btn { flex: 1; padding: 13px 6px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; color: var(--green-mid); font-family: 'Bebas Neue', sans-serif; font-size: 1.25rem; letter-spacing: .06em; cursor: pointer; transition: all .15s; }
+    .seg-btn.active { background: #1a3820; border-color: var(--green-dim); color: var(--green-hi); }
+
+    /* ── PRIMARY / SECONDARY BTNS ── */
+    .btn { width: 100%; padding: 16px; border: none; border-radius: 12px; font-family: 'Bebas Neue', sans-serif; font-size: 1.15rem; letter-spacing: .1em; cursor: pointer; transition: all .15s; margin-top: 10px; }
+    .btn:first-child { margin-top: 0; }
+    .btn-primary { background: linear-gradient(135deg, #2d6a32, #1a4520); color: var(--green-hi); border: 1px solid var(--border-hi); }
+    .btn-secondary { background: transparent; color: var(--green-mid); border: 1px solid var(--border); }
+    .btn-danger { background: transparent; color: var(--poor); border: 1px solid #3a1010; }
+    .btn:active { transform: scale(.97); }
+    .btn:disabled { opacity: .35; }
+
+    /* ── HOLE NAV ── */
+    .hole-nav { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
+    .hole-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; color: var(--green-hi); line-height: 1; }
+    .hole-of { font-size: .68rem; color: var(--green-dim); letter-spacing: .12em; text-transform: uppercase; text-align: center; margin-top: 3px; }
+    .nav-btn { width: 46px; height: 46px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; color: var(--green-mid); font-size: 1.3rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+    .nav-btn:disabled { opacity: .25; cursor: default; }
+
+    /* ── PROGRESS DOTS ── */
+    .progress-dots { display: flex; gap: 5px; justify-content: center; padding: 10px 0 18px; flex-wrap: wrap; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); transition: background .2s; cursor: pointer; }
+    .dot.complete { background: var(--green-dim); }
+    .dot.current { background: var(--green-hi); }
+
+    /* ── CATEGORY GRID ── */
+    .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+    .cat-item { background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 11px 10px; cursor: pointer; transition: all .15s; text-align: center; user-select: none; }
+    .cat-item.selected { background: #0f2914; border-color: var(--green-dim); }
+    .cat-item:active { transform: scale(.95); }
+    .cat-icon { font-size: 1.3rem; margin-bottom: 2px; }
+    .cat-label { font-size: .72rem; color: var(--green-mid); font-weight: 500; }
+
+    /* ── RATING ROW ── */
+    .rating-row { display: flex; gap: 8px; margin-bottom: 12px; }
+    .rating-btn { flex: 1; padding: 11px 4px; border-radius: 8px; border: 1px solid; font-family: 'Bebas Neue', sans-serif; font-size: .95rem; letter-spacing: .08em; cursor: pointer; transition: all .15s; line-height: 1.3; }
+    .rating-btn:active { transform: scale(.95); }
+
+    /* ── SHOTS LOG ── */
+    .shots-log { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
+    .shot-entry { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; }
+    .shot-entry-left { font-size: .83rem; color: var(--text-dim); }
+    .shot-badge { font-size: .68rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; letter-spacing: .06em; }
+    .remove-btn { background: none; border: none; color: #3a5a40; cursor: pointer; font-size: 1rem; padding: 0 0 0 10px; transition: color .15s; line-height: 1; }
+    .remove-btn:active { color: var(--poor); }
+
+    /* ── HOLE SCORE PREVIEW ── */
+    .hole-preview { display: flex; justify-content: space-between; align-items: center; }
+    .preview-pts { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; line-height: 1; }
+    .preview-detail { display: flex; gap: 14px; margin-top: 6px; }
+    .preview-detail span { font-size: .7rem; color: var(--green-mid); }
+
+    /* ── MODIFIER BADGE ── */
+    .mod-badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: .7rem; font-weight: 600; letter-spacing: .08em; background: var(--bg); border: 1px solid currentColor; margin-left: 8px; vertical-align: middle; }
+
+    /* ── SUMMARY HERO ── */
+    .score-hero { text-align: center; padding: 24px 0 18px; border-bottom: 1px solid var(--border); margin-bottom: 18px; }
+    .score-big { font-family: 'Bebas Neue', sans-serif; font-size: 5rem; line-height: 1; }
+    .score-breakdown { display: flex; justify-content: center; gap: 28px; margin-top: 14px; }
+    .score-mini-val { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; line-height: 1; }
+    .score-mini-lbl { font-size: .62rem; color: var(--green-dim); letter-spacing: .1em; text-transform: uppercase; margin-top: 2px; }
+
+    /* ── CATEGORY BARS ── */
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+    .bar-name { width: 84px; font-size: .72rem; color: var(--text-dim); font-weight: 500; flex-shrink: 0; }
+    .bar-wrap { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
+    .bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
+    .bar-pct { width: 36px; text-align: right; font-size: .78rem; font-weight: 600; flex-shrink: 0; }
+    .bar-count { width: 28px; text-align: right; font-size: .68rem; color: var(--green-dim); flex-shrink: 0; }
+
+    /* ── HOLE TABLE ── */
+    .hole-tbl { width: 100%; border-collapse: collapse; font-size: .76rem; }
+    .hole-tbl th { color: var(--green-dim); letter-spacing: .1em; text-transform: uppercase; font-size: .62rem; font-weight: 600; padding: 0 6px 10px; text-align: center; }
+    .hole-tbl td { padding: 6px; text-align: center; border-top: 1px solid #0f2014; color: var(--text-dim); }
+    .hole-tbl tfoot td { font-weight: 600; color: var(--green-hi); border-top: 1px solid var(--border); }
+
+    /* ── UTILS ── */
+    .mt8 { margin-top: 8px; }
+    .mb0 { margin-bottom: 0 !important; }
+    .section-hint { font-size: .62rem; color: var(--green-dim); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; font-weight: 600; }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script type="text/babel">
+
+const { useState, useCallback, useEffect } = React;
+
+const CATEGORIES = [
+  { id: "driving",   label: "Driving",    icon: "🏌️" },
+  { id: "longIron",  label: "Long Iron",  icon: "🔩" },
+  { id: "shortIron", label: "Short Iron", icon: "⚙️" },
+  { id: "wedge",     label: "Wedge",      icon: "🥏" },
+  { id: "bunker",    label: "Bunker",     icon: "🏖️" },
+  { id: "shortGame", label: "Short Game", icon: "🎯" },
+  { id: "putting",   label: "Putting",    icon: "🕳️" },
+  { id: "recovery",  label: "Recovery",   icon: "🌿" },
+];
+
+const RATINGS = [
+  { id: "good",    label: "Good",    value:  1, color: "#4ade80", bg: "#052e16" },
+  { id: "average", label: "Average", value:  0, color: "#fbbf24", bg: "#1c1005" },
+  { id: "poor",    label: "Poor",    value: -1, color: "#f87171", bg: "#1c0505" },
+];
+
+function holeModifier(score, par) {
+  const d = score - par;
+  if (d <= -2) return { label: "Eagle+",  pts:  3, color: "#a78bfa" };
+  if (d === -1) return { label: "Birdie",  pts:  2, color: "#4ade80" };
+  if (d ===  0) return { label: "Par",     pts:  1, color: "#60a5fa" };
+  if (d ===  1) return { label: "Bogey",   pts:  0, color: "#fbbf24" };
+  if (d ===  2) return { label: "Double",  pts: -1, color: "#fb923c" };
+  return              { label: "Triple+", pts: -2, color: "#f87171" };
+}
+
+function calcHoleScore(h) {
+  const shotPts = h.shots.reduce((a, s) => a + RATINGS.find(r => r.id === s.rating).value, 0);
+  const sNum = parseInt(h.score);
+  const modPts = (!isNaN(sNum) && h.par) ? holeModifier(sNum, h.par).pts : 0;
+  return { shotPts, modPts, total: shotPts + modPts };
+}
+
+const emptyHole = () => ({ par: 4, score: "", shots: [] });
+
+const STORAGE_KEY = "fairway_round";
+
+function loadState() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch { return null; }
+}
+
+function App() {
+  const [screen,        setScreen]        = useState("setup");
+  const [courseName,    setCourseName]    = useState("");
+  const [totalHoles,    setTotalHoles]    = useState(18);
+  const [holes,         setHoles]         = useState(() => Array.from({ length: 18 }, emptyHole));
+  const [currentHole,   setCurrentHole]   = useState(0);
+  const [selectedCat,   setSelectedCat]   = useState(null);
+  const [selectedRating,setSelectedRating]= useState(null);
+  const [savedAlert,    setSavedAlert]    = useState(false);
+
+  // Restore in-progress round on load
+  useEffect(() => {
+    const saved = loadState();
+    if (saved) {
+      setCourseName(saved.courseName || "");
+      setTotalHoles(saved.totalHoles || 18);
+      setHoles(saved.holes);
+      setCurrentHole(saved.currentHole || 0);
+      setScreen("hole");
+    }
+  }, []);
+
+  // Persist state whenever holes change
+  useEffect(() => {
+    if (screen === "hole") {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ courseName, totalHoles, holes, currentHole }));
+    }
+  }, [holes, screen]);
+
+  const startRound = () => {
+    const h = Array.from({ length: totalHoles }, emptyHole);
+    setHoles(h);
+    setCurrentHole(0);
+    setSelectedCat(null);
+    setSelectedRating(null);
+    localStorage.removeItem(STORAGE_KEY);
+    setScreen("hole");
+  };
+
+  const hole = holes[currentHole];
+
+  const updateHole = useCallback((field, value) => {
+    setHoles(prev => prev.map((h, i) => i === currentHole ? { ...h, [field]: value } : h));
+  }, [currentHole]);
+
+  const addShot = () => {
+    if (!selectedCat || !selectedRating) return;
+    updateHole("shots", [...hole.shots, { cat: selectedCat, rating: selectedRating }]);
+    setSelectedCat(null);
+    setSelectedRating(null);
+  };
+
+  const removeShot = idx => updateHole("shots", hole.shots.filter((_, i) => i !== idx));
+
+  const navigate = dir => {
+    const next = currentHole + dir;
+    if (next >= 0 && next < totalHoles) {
+      setCurrentHole(next);
+      setSelectedCat(null);
+      setSelectedRating(null);
+    }
+  };
+
+  const finishRound = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setScreen("summary");
+  };
+
+  // ── SUMMARY DATA ──
+  const computeSummary = () => {
+    let shotPtsTotal = 0, modPtsTotal = 0, strokes = 0, par = 0;
+    const cats = {};
+    CATEGORIES.forEach(c => { cats[c.id] = { decent: 0, total: 0 }; });
+    holes.forEach(h => {
+      const hs = calcHoleScore(h);
+      shotPtsTotal += hs.shotPts;
+      modPtsTotal  += hs.modPts;
+      const n = parseInt(h.score);
+      if (!isNaN(n)) { strokes += n; par += h.par; }
+      h.shots.forEach(s => {
+        cats[s.cat].total++;
+        if (s.rating !== "poor") cats[s.cat].decent++;
+      });
+    });
+    return { total: shotPtsTotal + modPtsTotal, shotPtsTotal, modPtsTotal, strokes, par, cats };
+  };
+
+  const barColor = pct => pct >= 75 ? "#4ade80" : pct >= 50 ? "#a3e4a0" : pct >= 30 ? "#fbbf24" : "#f87171";
+
+  const scoreNum = parseInt(hole.score);
+  const modifier = (!isNaN(scoreNum) && hole.par) ? holeModifier(scoreNum, hole.par) : null;
+  const canAdd   = selectedCat && selectedRating;
+  const hs       = calcHoleScore(hole);
+  const summary  = screen === "summary" ? computeSummary() : null;
+
+  // ════════════════════════════════════════════════════════
+  // SETUP SCREEN
+  // ════════════════════════════════════════════════════════
+  if (screen === "setup") return (
+    <div className="app">
+      <div className="header">
+        <div className="header-title">Fairway Score</div>
+        <div className="header-sub">Performance Golf Tracker</div>
+      </div>
+      <div className="screen-body">
+        <div className="card">
+          <div className="card-title">New Round</div>
+          <div className="input-group">
+            <label className="label">Course Name (optional)</label>
+            <input className="input" placeholder="e.g. Royal Johannesburg" value={courseName}
+              onChange={e => setCourseName(e.target.value)} />
+          </div>
+          <div className="input-group mb0">
+            <label className="label">Number of Holes</label>
+            <div className="seg-row">
+              {[9, 18].map(n => (
+                <button key={n} className={`seg-btn ${totalHoles === n ? "active" : ""}`}
+                  onClick={() => setTotalHoles(n)}>{n} Holes</button>
+              ))}
+            </div>
+          </div>
+        </div>
+        <button className="btn btn-primary" onClick={startRound}>Start Round →</button>
+      </div>
+    </div>
+  );
+
+  // ════════════════════════════════════════════════════════
+  // HOLE SCREEN
+  // ════════════════════════════════════════════════════════
+  if (screen === "hole") return (
+    <div className="app">
+      <div className="header">
+        <div className="header-title">{courseName || "Round in Progress"}</div>
+        <div className="header-sub">Log shots after each hole</div>
+      </div>
+      <div className="screen-body">
+
+        {/* Navigation */}
+        <div className="hole-nav">
+          <button className="nav-btn" onClick={() => navigate(-1)} disabled={currentHole === 0}>‹</button>
+          <div style={{ textAlign: "center" }}>
+            <div className="hole-num">HOLE {currentHole + 1}</div>
+            <div className="hole-of">of {totalHoles}</div>
+          </div>
+          <button className="nav-btn" onClick={() => navigate(1)} disabled={currentHole === totalHoles - 1}>›</button>
+        </div>
+
+        {/* Dots */}
+        <div className="progress-dots">
+          {holes.map((h, i) => (
+            <div key={i}
+              className={`dot ${i === currentHole ? "current" : h.score !== "" ? "complete" : ""}`}
+              onClick={() => { setCurrentHole(i); setSelectedCat(null); setSelectedRating(null); }} />
+          ))}
+        </div>
+
+        {/* Par & Score */}
+        <div className="card">
+          <div className="card-title">Hole Result</div>
+          <div className="input-group">
+            <label className="label">Par</label>
+            <div className="seg-row">
+              {[3, 4, 5].map(p => (
+                <button key={p} className={`seg-btn ${hole.par === p ? "active" : ""}`}
+                  onClick={() => updateHole("par", p)}>{p}</button>
+              ))}
+            </div>
+          </div>
+          <div className="input-group mb0">
+            <label className="label">
+              Your Score
+              {modifier && (
+                <span className="mod-badge" style={{ color: modifier.color, borderColor: modifier.color }}>
+                  {modifier.label} {modifier.pts >= 0 ? "+" : ""}{modifier.pts}pts
+                </span>
+              )}
+            </label>
+            <input className="input" type="number" inputMode="numeric" min="1" max="15"
+              placeholder="Strokes played" value={hole.score}
+              onChange={e => updateHole("score", e.target.value)} />
+          </div>
+        </div>
+
+        {/* Shot Logger */}
+        <div className="card">
+          <div className="card-title">Log Shots</div>
+          <label className="label">Shot Category</label>
+          <div className="cat-grid">
+            {CATEGORIES.map(c => (
+              <div key={c.id} className={`cat-item ${selectedCat === c.id ? "selected" : ""}`}
+                onClick={() => setSelectedCat(selectedCat === c.id ? null : c.id)}>
+                <div className="cat-icon">{c.icon}</div>
+                <div className="cat-label">{c.label}</div>
+              </div>
+            ))}
+          </div>
+
+          <label className="label">Rating</label>
+          <div className="rating-row">
+            {RATINGS.map(r => (
+              <button key={r.id} className="rating-btn"
+                style={{
+                  color: r.color,
+                  borderColor: selectedRating === r.id ? r.color : "var(--border)",
+                  background: selectedRating === r.id ? r.bg : "transparent",
+                }}
+                onClick={() => setSelectedRating(selectedRating === r.id ? null : r.id)}>
+                {r.label}<br />
+                <span style={{ fontSize: ".72rem", opacity: .7 }}>{r.value > 0 ? "+" : ""}{r.value}</span>
+              </button>
+            ))}
+          </div>
+
+          <button className="btn btn-primary" disabled={!canAdd} onClick={addShot}>+ Add Shot</button>
+
+          {hole.shots.length > 0 && (
+            <div className="shots-log">
+              {hole.shots.map((s, i) => {
+                const cat = CATEGORIES.find(c => c.id === s.cat);
+                const rat = RATINGS.find(r => r.id === s.rating);
+                return (
+                  <div key={i} className="shot-entry">
+                    <span className="shot-entry-left">{cat.icon} {cat.label}</span>
+                    <span className="shot-badge"
+                      style={{ color: rat.color, background: rat.bg, border: `1px solid ${rat.color}44` }}>
+                      {rat.label} {rat.value >= 0 ? "+" : ""}{rat.value}
+                    </span>
+                    <button className="remove-btn" onClick={() => removeShot(i)}>✕</button>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Hole Score Preview */}
+        {(hole.shots.length > 0 || hole.score !== "") && (
+          <div className="card" style={{ border: "1px solid #2a4a30" }}>
+            <div className="hole-preview">
+              <div>
+                <div className="label" style={{ marginBottom: 4 }}>Hole Score</div>
+                <div className="preview-detail">
+                  <span>Shots: {hs.shotPts >= 0 ? "+" : ""}{hs.shotPts}</span>
+                  <span>Modifier: {hs.modPts >= 0 ? "+" : ""}{hs.modPts}</span>
+                </div>
+              </div>
+              <div className="preview-pts" style={{ color: hs.total >= 0 ? "#4ade80" : "#f87171" }}>
+                {hs.total >= 0 ? "+" : ""}{hs.total}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentHole < totalHoles - 1
+          ? <button className="btn btn-primary" onClick={() => navigate(1)}>Next Hole →</button>
+          : <button className="btn btn-primary" onClick={finishRound}>Finish Round ✓</button>
+        }
+        <button className="btn btn-secondary" onClick={() => setScreen("setup")}>← New Round</button>
+      </div>
+    </div>
+  );
+
+  // ════════════════════════════════════════════════════════
+  // SUMMARY SCREEN
+  // ════════════════════════════════════════════════════════
+  if (screen === "summary" && summary) return (
+    <div className="app">
+      <div className="header">
+        <div className="header-title">Round Summary</div>
+        <div className="header-sub">{courseName || "Performance Report"}</div>
+      </div>
+      <div className="screen-body">
+
+        <div className="score-hero">
+          <div className="label" style={{ marginBottom: 6 }}>Total Performance Score</div>
+          <div className="score-big" style={{ color: summary.total >= 0 ? "#a3e4a0" : "#f87171" }}>
+            {summary.total >= 0 ? "+" : ""}{summary.total}
+          </div>
+          <div className="score-breakdown">
+            <div>
+              <div className="score-mini-val" style={{ color: "#60a5fa" }}>
+                {summary.strokes > 0 ? (summary.strokes - summary.par >= 0 ? "+" : "") + (summary.strokes - summary.par) : "—"}
+              </div>
+              <div className="score-mini-lbl">vs Par</div>
+            </div>
+            <div>
+              <div className="score-mini-val" style={{ color: "#a78bfa" }}>
+                {summary.shotPtsTotal >= 0 ? "+" : ""}{summary.shotPtsTotal}
+              </div>
+              <div className="score-mini-lbl">Shot Pts</div>
+            </div>
+            <div>
+              <div className="score-mini-val" style={{ color: "#fbbf24" }}>
+                {summary.modPtsTotal >= 0 ? "+" : ""}{summary.modPtsTotal}
+              </div>
+              <div className="score-mini-lbl">Hole Mod</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Category Breakdown */}
+        <div className="card">
+          <div className="card-title">Shot Category Quality</div>
+          <div className="section-hint">% Good + Average shots per category</div>
+          {CATEGORIES.map(cat => {
+            const s = summary.cats[cat.id];
+            if (s.total === 0) return null;
+            const pct = Math.round((s.decent / s.total) * 100);
+            const col = barColor(pct);
+            return (
+              <div key={cat.id} className="bar-row">
+                <div className="bar-name">{cat.icon} {cat.label}</div>
+                <div className="bar-wrap">
+                  <div className="bar-fill" style={{ width: `${pct}%`, background: col }} />
+                </div>
+                <div className="bar-pct" style={{ color: col }}>{pct}%</div>
+                <div className="bar-count">{s.decent}/{s.total}</div>
+              </div>
+            );
+          })}
+          {CATEGORIES.every(c => summary.cats[c.id].total === 0) && (
+            <div style={{ color: "var(--green-dim)", fontSize: ".85rem" }}>No shots logged</div>
+          )}
+        </div>
+
+        {/* Hole by Hole */}
+        <div className="card">
+          <div className="card-title">Hole by Hole</div>
+          <table className="hole-tbl">
+            <thead>
+              <tr><th>Hole</th><th>Par</th><th>Score</th><th>Result</th><th>Pts</th></tr>
+            </thead>
+            <tbody>
+              {holes.map((h, i) => {
+                const n = parseInt(h.score);
+                const hs = calcHoleScore(h);
+                const mod = (!isNaN(n) && h.par) ? holeModifier(n, h.par) : null;
+                return (
+                  <tr key={i}>
+                    <td>{i + 1}</td>
+                    <td>{h.par}</td>
+                    <td>{h.score || "—"}</td>
+                    <td style={{ color: mod?.color || "var(--green-dim)" }}>{mod?.label || "—"}</td>
+                    <td style={{ color: hs.total >= 0 ? "#4ade80" : "#f87171" }}>
+                      {hs.total >= 0 ? "+" : ""}{hs.total}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colSpan={2}>Total</td>
+                <td>{summary.strokes || "—"}</td>
+                <td style={{ color: "#60a5fa" }}>
+                  {summary.strokes > 0
+                    ? (summary.strokes - summary.par >= 0 ? "+" : "") + (summary.strokes - summary.par)
+                    : "—"}
+                </td>
+                <td style={{ color: summary.total >= 0 ? "#4ade80" : "#f87171" }}>
+                  {summary.total >= 0 ? "+" : ""}{summary.total}
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <button className="btn btn-primary" onClick={() => { setScreen("setup"); localStorage.removeItem(STORAGE_KEY); }}>
+          ← New Round
+        </button>
+        <button className="btn btn-secondary" onClick={() => setScreen("hole")}>
+          Back to Round
+        </button>
+      </div>
+    </div>
+  );
+
+  return null;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+
+// Register service worker
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
