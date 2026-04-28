@@ -1,4 +1,4 @@
-const CACHE = 'fairway-v1';
+const CACHE = 'fairway-v2';
 const ASSETS = ['./', './index.html', './manifest.json'];
 
 self.addEventListener('install', e => {

@@ -2,17 +2,26 @@
   "name": "Fairway Score",
   "short_name": "Fairway",
   "description": "Performance golf scorer with shot category tracking",
-  "start_url": "/",
+  "id": "/Golf-app/",
+  "start_url": "/Golf-app/",
+  "scope": "/Golf-app/",
   "display": "standalone",
   "background_color": "#0a1a0e",
   "theme_color": "#0f2914",
   "orientation": "portrait",
+  "categories": ["sports", "lifestyle"],
   "icons": [
     {
       "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='%230f2914'/><text y='130' x='96' text-anchor='middle' font-size='120' font-family='serif'>⛳</text></svg>",
-      "sizes": "192x192",
+      "sizes": "192x192 512x512",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' fill='%230f2914'/><text y='128' x='96' text-anchor='middle' font-size='90' font-family='serif'>⛳</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
   ]
 }
