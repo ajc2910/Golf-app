@@ -213,6 +213,67 @@ function loadState() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch { return null; }
 }
 
+function csvEscape(v) {
+  const s = v == null ? "" : String(v);
+  return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+}
+
+function buildRoundCSV(courseName, holes, totalHoles) {
+  const rows = [];
+  let strokes = 0, par = 0, total = 0;
+  holes.forEach(h => {
+    const hs = calcHoleScore(h);
+    total += hs.total;
+    const n = parseInt(h.score);
+    if (!isNaN(n)) { strokes += n; par += h.par; }
+  });
+  const vsPar = strokes > 0 ? (strokes - par >= 0 ? "+" : "") + (strokes - par) : "";
+  const totalStr = total >= 0 ? "+" + total : String(total);
+
+  rows.push(["Course", courseName || ""]);
+  rows.push(["Date", new Date().toISOString()]);
+  rows.push(["Holes", totalHoles]);
+  rows.push(["Total Strokes", strokes || ""]);
+  rows.push(["Total Par", par || ""]);
+  rows.push(["Vs Par", vsPar]);
+  rows.push(["Total Points", totalStr]);
+  rows.push([]);
+
+  rows.push(["Hole Summary"]);
+  rows.push(["Hole", "Par", "Strokes", "Result", "Hole Points"]);
+  holes.forEach((h, i) => {
+    const n = parseInt(h.score);
+    const hs = calcHoleScore(h);
+    const mod = (!isNaN(n) && h.par) ? holeModifier(n, h.par) : null;
+    rows.push([i + 1, h.par, h.score || "", mod ? mod.label : "", hs.total]);
+  });
+  rows.push([]);
+
+  rows.push(["Shot Detail"]);
+  rows.push(["Hole", "Shot", "Category", "Rating", "Points"]);
+  holes.forEach((h, i) => {
+    h.shots.forEach((s, j) => {
+      const cat = CATEGORIES.find(c => c.id === s.cat);
+      const rating = RATINGS.find(r => r.id === s.rating);
+      rows.push([
+        i + 1,
+        j + 1,
+        cat ? cat.label : s.cat,
+        rating ? rating.label : s.rating,
+        rating ? rating.value : 0,
+      ]);
+    });
+  });
+
+  return rows.map(r => r.map(csvEscape).join(",")).join("\r\n");
+}
+
+function roundFilename(courseName) {
+  const date = new Date().toISOString().slice(0, 10);
+  const safe = (courseName || "Round").replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "") || "Round";
+  return `Fairway-${safe}-${date}.csv`;
+}
+
 function App() {
   const [screen,        setScreen]        = useState("setup");
   const [courseName,    setCourseName]    = useState("");
@@ -279,6 +340,30 @@ function App() {
   const finishRound = () => {
     localStorage.removeItem(STORAGE_KEY);
     setScreen("summary");
+  };
+
+  const exportRound = async () => {
+    const csv = buildRoundCSV(courseName, holes, totalHoles);
+    const filename = roundFilename(courseName);
+    const file = new File([csv], filename, { type: "text/csv" });
+
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: filename });
+        return;
+      } catch (err) {
+        if (err && err.name === "AbortError") return;
+      }
+    }
+
+    const url = URL.createObjectURL(file);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   };
 
   // ── SUMMARY DATA ──
@@ -581,7 +666,10 @@ function App() {
           </table>
         </div>
 
-        <button className="btn btn-primary" onClick={() => { setScreen("setup"); localStorage.removeItem(STORAGE_KEY); }}>
+        <button className="btn btn-primary" onClick={exportRound}>
+          ⤴ Export / Share CSV
+        </button>
+        <button className="btn btn-secondary" onClick={() => { setScreen("setup"); localStorage.removeItem(STORAGE_KEY); }}>
           ← New Round
         </button>
         <button className="btn btn-secondary" onClick={() => setScreen("hole")}>
