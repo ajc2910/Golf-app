@@ -5,7 +5,7 @@
 A Progressive Web App (PWA) for Android that tracks golf performance beyond a simple stroke count. Instead of measuring only score relative to par, it evaluates **shot execution quality** across eight categories and combines that with a **hole outcome modifier** to produce a composite performance score.
 
 Installed on a Samsung Galaxy S25 Ultra via Chrome's "Add to Home Screen" and hosted on GitHub Pages at:
-`https://andrewjcuffe-cloud.github.io/Golf-app`
+`https://ajc2910.github.io/Golf-app`
 
 ---
 
@@ -97,8 +97,8 @@ Golf-app/
 
 Hosted on **GitHub Pages** (free):
 
-- Repo: `https://github.com/andrewjcuffe-cloud/Golf-app`
-- Live URL: `https://andrewjcuffe-cloud.github.io/Golf-app`
+- Repo: `https://github.com/ajc2910/Golf-app`
+- Live URL: `https://ajc2910.github.io/Golf-app`
 - Branch: `main`, root folder `/`
 
 To update the app: edit `index.html` in the repo and commit. GitHub Pages redeploys automatically within ~60 seconds.
