@@ -193,7 +193,8 @@ const CATEGORIES = [
   { id: "wedge",     label: "Wedge",      icon: "🥏" },
   { id: "bunker",    label: "Bunker",     icon: "🏖️" },
   { id: "shortGame", label: "Short Game", icon: "🎯" },
-  { id: "putting",   label: "Putting",    icon: "🕳️" },
+  { id: "lagPutt",   label: "Lag Putt",   icon: "↔️" },
+  { id: "holeOut",   label: "Hole-Out",   icon: "🕳️" },
   { id: "recovery",  label: "Recovery",   icon: "🌿" },
 ];
 
@@ -209,12 +210,25 @@ const RATINGS = [
 
 // Map legacy good/average/poor data onto the new 1–5 scale.
 const LEGACY_RATING = { good: "5", average: "3", poor: "1", "1": "1", "2": "2", "3": "3", "4": "4", "5": "5" };
+// The old single "putting" category became Lag Putt + Hole-Out; default old putts to Hole-Out.
+const LEGACY_CAT = { putting: "holeOut" };
 function migrateHole(h) {
   return {
     par: h.par || 4,
     score: h.score == null ? "" : h.score,
-    shots: (h.shots || []).map(s => ({ cat: s.cat, rating: LEGACY_RATING[s.rating] || "3" })),
+    shots: (h.shots || []).map(s => ({ cat: LEGACY_CAT[s.cat] || s.cat, rating: LEGACY_RATING[s.rating] || "3" })),
   };
+}
+function migrateRecord(rec) {
+  return { ...rec, holes: (rec.holes || []).map(migrateHole) };
+}
+
+// Average shot rating (1–5) over LOGGED shots only. Unlogged strokes (tap-ins)
+// are not counted, so the average is the aggregate rating ÷ number of rated shots.
+function avgRating(shots) {
+  let sum = 0, n = 0;
+  shots.forEach(s => { const r = parseInt(s.rating); if (!isNaN(r)) { sum += r; n++; } });
+  return n ? sum / n : null;
 }
 
 function ratingValue(id) {
@@ -277,6 +291,7 @@ function buildRoundCSV(courseName, holes, totalHoles, dateISO) {
   const rows = [];
   const { total, strokes, par } = roundTotals(holes);
   const vsPar = strokes > 0 ? fmtSigned(strokes - par) : "";
+  const avgShot = avgRating(holes.flatMap(h => h.shots));
 
   rows.push(["Course", courseName || ""]);
   rows.push(["Date", dateISO || new Date().toISOString()]);
@@ -285,6 +300,7 @@ function buildRoundCSV(courseName, holes, totalHoles, dateISO) {
   rows.push(["Total Par", par || ""]);
   rows.push(["Vs Par", vsPar]);
   rows.push(["Total Points", fmtSigned(total)]);
+  rows.push(["Avg Shot Rating", avgShot != null ? avgShot.toFixed(2) : ""]);
   rows.push([]);
 
   rows.push(["Hole Summary"]);
@@ -361,7 +377,7 @@ function App() {
   const [currentHole,    setCurrentHole]    = useState(0);
   const [selectedCat,    setSelectedCat]    = useState(null);
   const [selectedRating, setSelectedRating] = useState(null);
-  const [history,        setHistory]        = useState(() => loadHistory());
+  const [history,        setHistory]        = useState(() => loadHistory().map(migrateRecord));
   const [savedRoundId,   setSavedRoundId]   = useState(null); // id of the round saved to history this session
   const [historyView,    setHistoryView]    = useState(null); // a saved round record being viewed read-only
 
@@ -463,7 +479,7 @@ function App() {
 
   // ── SUMMARY DATA (works for the live round or a saved record) ──
   const computeSummary = (hs0) => {
-    let shotPtsTotal = 0, modPtsTotal = 0, strokes = 0, par = 0;
+    let shotPtsTotal = 0, modPtsTotal = 0, strokes = 0, par = 0, shotSum = 0, shotCount = 0;
     const cats = {};
     CATEGORIES.forEach(c => { cats[c.id] = { sum: 0, total: 0 }; });
     hs0.forEach(h => {
@@ -474,30 +490,36 @@ function App() {
       if (!isNaN(n)) { strokes += n; par += h.par; }
       h.shots.forEach(s => {
         const rn = parseInt(s.rating);
-        if (!isNaN(rn) && cats[s.cat]) { cats[s.cat].sum += rn; cats[s.cat].total++; }
+        if (isNaN(rn)) return;
+        shotSum += rn; shotCount++;                         // every rated shot (tap-ins excluded)
+        if (cats[s.cat]) { cats[s.cat].sum += rn; cats[s.cat].total++; }
       });
     });
-    return { total: shotPtsTotal + modPtsTotal, shotPtsTotal, modPtsTotal, strokes, par, cats };
+    const avgShot = shotCount ? shotSum / shotCount : null;
+    return { total: shotPtsTotal + modPtsTotal, shotPtsTotal, modPtsTotal, strokes, par, cats, avgShot, shotCount };
   };
 
   // ── AGGREGATE STATS across all saved rounds ──
   const aggregateStats = () => {
     const cats = {};
     CATEGORIES.forEach(c => { cats[c.id] = { sum: 0, total: 0 }; });
-    let totalSum = 0, vsParSum = 0, vsParRounds = 0;
+    let totalSum = 0, vsParSum = 0, vsParRounds = 0, shotSum = 0, shotCount = 0;
     history.forEach(rec => {
       const t = roundTotals(rec.holes);
       totalSum += t.total;
       if (t.vsPar != null) { vsParSum += t.vsPar; vsParRounds++; }
       rec.holes.forEach(h => h.shots.forEach(s => {
         const rn = parseInt(s.rating);
-        if (!isNaN(rn) && cats[s.cat]) { cats[s.cat].sum += rn; cats[s.cat].total++; }
+        if (isNaN(rn)) return;
+        shotSum += rn; shotCount++;
+        if (cats[s.cat]) { cats[s.cat].sum += rn; cats[s.cat].total++; }
       }));
     });
     return {
       rounds: history.length,
       avgScore: history.length ? totalSum / history.length : 0,
       avgVsPar: vsParRounds ? vsParSum / vsParRounds : null,
+      avgShot: shotCount ? shotSum / shotCount : null,
       cats,
     };
   };
@@ -506,6 +528,8 @@ function App() {
   const modifier = (!isNaN(scoreNum) && hole.par) ? holeModifier(scoreNum, hole.par) : null;
   const canAdd   = selectedCat && selectedRating;
   const hs       = calcHoleScore(hole);
+  const holeAvg  = avgRating(hole.shots);
+  const tapIns   = (!isNaN(scoreNum) ? scoreNum : 0) - hole.shots.length; // unlogged strokes = tap-ins
 
   // ════════════════════════════════════════════════════════
   // SETUP SCREEN
@@ -663,12 +687,18 @@ function App() {
                 <div className="preview-detail">
                   <span>Shots: {fmtSigned(hs.shotPts)}</span>
                   <span>Modifier: {fmtSigned(hs.modPts)}</span>
+                  <span>Avg shot: {holeAvg != null ? holeAvg.toFixed(1) : "—"}/5</span>
                 </div>
               </div>
               <div className="preview-pts" style={{ color: hs.total >= 0 ? "#4ade80" : "#f87171" }}>
                 {fmtSigned(hs.total)}
               </div>
             </div>
+            {tapIns > 0 && (
+              <div style={{ fontSize: ".62rem", color: "var(--green-dim)", marginTop: 8, letterSpacing: ".06em" }}>
+                {tapIns} tap-in{tapIns > 1 ? "s" : ""} assumed · not rated, excluded from avg
+              </div>
+            )}
           </div>
         )}
 
@@ -704,7 +734,13 @@ function App() {
             <div className="score-big" style={{ color: summary.total >= 0 ? "#a3e4a0" : "#f87171" }}>
               {fmtSigned(summary.total)}
             </div>
-            <div className="score-breakdown">
+            <div className="score-breakdown" style={{ gap: 22, flexWrap: "wrap" }}>
+              <div>
+                <div className="score-mini-val" style={{ color: "#4ade80" }}>
+                  {summary.avgShot != null ? summary.avgShot.toFixed(1) : "—"}
+                </div>
+                <div className="score-mini-lbl">Avg Shot /5</div>
+              </div>
               <div>
                 <div className="score-mini-val" style={{ color: "#60a5fa" }}>
                   {summary.strokes > 0 ? fmtSigned(summary.strokes - summary.par) : "—"}
@@ -832,7 +868,13 @@ function App() {
             <>
               <div className="card">
                 <div className="card-title">Career Averages</div>
-                <div className="score-breakdown" style={{ justifyContent: "space-around" }}>
+                <div className="score-breakdown" style={{ justifyContent: "space-around", gap: 18, flexWrap: "wrap" }}>
+                  <div>
+                    <div className="score-mini-val" style={{ color: "#4ade80" }}>
+                      {stats.avgShot != null ? stats.avgShot.toFixed(1) : "—"}
+                    </div>
+                    <div className="score-mini-lbl">Avg Shot /5</div>
+                  </div>
                   <div>
                     <div className="score-mini-val" style={{ color: "#a3e4a0" }}>{fmtSigned(Math.round(stats.avgScore))}</div>
                     <div className="score-mini-lbl">Avg Score</div>

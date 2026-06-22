@@ -34,7 +34,8 @@ Composite points are **centred on 3** (neutral), so a "3" neither helps nor hurt
 | Wedge      | Wedge approaches and pitches         |
 | Bunker     | Sand play                            |
 | Short Game | Chipping and bump-and-run            |
-| Putting    | All putts                            |
+| Lag Putt   | Long approach putts                  |
+| Hole-Out   | Putts holed / made                   |
 | Recovery   | Punch-outs, unplanned scramble shots |
 
 ### Hole Outcome Modifier
@@ -63,6 +64,9 @@ Hole Score = Sum of shot ratings + Hole modifier
 - **Total Performance Score** = sum of all hole scores
 - **Category Quality** = average rating (out of 5) per category
   - e.g. drives rated 5, 4, 3 → average 4.0
+- **Average Shot Rating** = aggregate rating ÷ number of **logged** shots
+  - Unlogged strokes are treated as tap-ins and excluded. e.g. a hole played in 5 strokes
+    with only 4 shots rated is averaged over 4, and the hole flags "1 tap-in assumed".
 - **Hole-by-hole table** with par, strokes, result label, and points
 - **Round history & stats** — completed rounds are saved to `localStorage` and shown on a
   History screen with career averages (avg score, avg vs par) and per-category trend bars
