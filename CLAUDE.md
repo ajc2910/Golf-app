@@ -13,13 +13,16 @@ Installed on a Samsung Galaxy S25 Ultra via Chrome's "Add to Home Screen" and ho
 
 ### Shot Quality (logged per shot, at end of each hole)
 
-Each shot is tagged to a category and rated:
+Each shot is tagged to a category and rated on a **1–5 scale** (1 = worst, 5 = best).
+Composite points are **centred on 3** (neutral), so a "3" neither helps nor hurts the score:
 
-| Rating  | Points |
-|---------|--------|
-| Good    | +1     |
-| Average |  0     |
-| Poor    | -1     |
+| Rating | Label | Points |
+|--------|-------|--------|
+| 5      | Great | +2     |
+| 4      | Good  | +1     |
+| 3      | OK    |  0     |
+| 2      | Weak  | -1     |
+| 1      | Poor  | -2     |
 
 ### Shot Categories
 
@@ -58,9 +61,13 @@ Hole Score = Sum of shot ratings + Hole modifier
 ### Round Summary
 
 - **Total Performance Score** = sum of all hole scores
-- **Category Quality %** = (Good + Average shots) / total shots in that category
-  - e.g. 4 decent drives from 8 = 50%
+- **Category Quality** = average rating (out of 5) per category
+  - e.g. drives rated 5, 4, 3 → average 4.0
 - **Hole-by-hole table** with par, strokes, result label, and points
+- **Round history & stats** — completed rounds are saved to `localStorage` and shown on a
+  History screen with career averages (avg score, avg vs par) and per-category trend bars
+- **Save to cloud** — the round exports as CSV via the Web Share API; on Android the share
+  sheet offers "Save to Drive" so scorecards accumulate in Google Drive over time
 
 ---
 
@@ -100,8 +107,8 @@ To update the app: edit `index.html` in the repo and commit. GitHub Pages redepl
 
 ## Potential Enhancements
 
-- [ ] Round history — save completed rounds to `localStorage` and display a history screen
-- [ ] Export to CSV — download round data for analysis in Excel / Python
+- [x] Round history — save completed rounds to `localStorage` and display a history screen
+- [x] Export to CSV — download round data for analysis in Excel / Python
 - [ ] Handicap-adjusted par targets per hole
 - [ ] Course library — save common courses with pre-filled par values per hole
 - [ ] Trend charts — rolling category quality % across last N rounds

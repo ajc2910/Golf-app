@@ -100,9 +100,10 @@
 
     /* ── PROGRESS DOTS ── */
     .progress-dots { display: flex; gap: 5px; justify-content: center; padding: 10px 0 18px; flex-wrap: wrap; }
-    .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); transition: background .2s; cursor: pointer; }
+    .dot { width: 13px; height: 13px; border-radius: 50%; background: var(--border); transition: background .2s, transform .15s; cursor: pointer; }
+    .dot:active { transform: scale(1.3); }
     .dot.complete { background: var(--green-dim); }
-    .dot.current { background: var(--green-hi); }
+    .dot.current { background: var(--green-hi); box-shadow: 0 0 0 3px #0f2914; }
 
     /* ── CATEGORY GRID ── */
     .cat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
@@ -113,15 +114,18 @@
     .cat-label { font-size: .72rem; color: var(--green-mid); font-weight: 500; }
 
     /* ── RATING ROW ── */
-    .rating-row { display: flex; gap: 8px; margin-bottom: 12px; }
-    .rating-btn { flex: 1; padding: 11px 4px; border-radius: 8px; border: 1px solid; font-family: 'Bebas Neue', sans-serif; font-size: .95rem; letter-spacing: .08em; cursor: pointer; transition: all .15s; line-height: 1.3; }
+    .rating-row { display: flex; gap: 6px; margin-bottom: 8px; }
+    .rating-btn { flex: 1; padding: 12px 2px; border-radius: 8px; border: 1px solid; font-family: 'Bebas Neue', sans-serif; cursor: pointer; transition: all .15s; line-height: 1.1; text-align: center; }
     .rating-btn:active { transform: scale(.95); }
+    .rating-num { font-size: 1.5rem; }
+    .rating-desc { display: block; font-size: .52rem; letter-spacing: .04em; text-transform: uppercase; opacity: .75; margin-top: 2px; }
+    .scale-hint { display: flex; justify-content: space-between; font-size: .58rem; color: var(--green-dim); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 14px; padding: 0 2px; }
 
     /* ── SHOTS LOG ── */
     .shots-log { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; }
     .shot-entry { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; padding: 9px 12px; }
-    .shot-entry-left { font-size: .83rem; color: var(--text-dim); }
-    .shot-badge { font-size: .68rem; font-weight: 600; padding: 3px 9px; border-radius: 20px; letter-spacing: .06em; }
+    .shot-entry-left { font-size: .83rem; color: var(--text-dim); flex: 1; }
+    .shot-badge { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; min-width: 30px; text-align: center; padding: 2px 9px; border-radius: 20px; letter-spacing: .06em; }
     .remove-btn { background: none; border: none; color: #3a5a40; cursor: pointer; font-size: 1rem; padding: 0 0 0 10px; transition: color .15s; line-height: 1; }
     .remove-btn:active { color: var(--poor); }
 
@@ -146,7 +150,7 @@
     .bar-name { width: 84px; font-size: .72rem; color: var(--text-dim); font-weight: 500; flex-shrink: 0; }
     .bar-wrap { flex: 1; height: 8px; background: var(--bg); border-radius: 4px; overflow: hidden; border: 1px solid var(--border); }
     .bar-fill { height: 100%; border-radius: 4px; transition: width .6s ease; }
-    .bar-pct { width: 36px; text-align: right; font-size: .78rem; font-weight: 600; flex-shrink: 0; }
+    .bar-pct { width: 40px; text-align: right; font-size: .78rem; font-weight: 600; flex-shrink: 0; }
     .bar-count { width: 28px; text-align: right; font-size: .68rem; color: var(--green-dim); flex-shrink: 0; }
 
     /* ── HOLE TABLE ── */
@@ -155,19 +159,30 @@
     .hole-tbl td { padding: 6px; text-align: center; border-top: 1px solid #0f2014; color: var(--text-dim); }
     .hole-tbl tfoot td { font-weight: 600; color: var(--green-hi); border-top: 1px solid var(--border); }
 
+    /* ── HISTORY LIST ── */
+    .round-row { display: flex; align-items: center; justify-content: space-between; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: transform .15s, border-color .15s; }
+    .round-row:active { transform: scale(.98); border-color: var(--green-dim); }
+    .round-course { font-size: .92rem; color: var(--text); font-weight: 500; }
+    .round-meta { font-size: .68rem; color: var(--green-dim); margin-top: 3px; letter-spacing: .04em; }
+    .round-score { font-family: 'Bebas Neue', sans-serif; font-size: 1.7rem; line-height: 1; }
+    .round-right { display: flex; align-items: center; gap: 6px; }
+    .del-round { background: none; border: none; color: #3a5a40; font-size: 1.05rem; padding: 6px; cursor: pointer; transition: color .15s; }
+    .del-round:active { color: var(--poor); }
+
     /* ── UTILS ── */
     .mt8 { margin-top: 8px; }
     .mb0 { margin-bottom: 0 !important; }
     .section-hint { font-size: .62rem; color: var(--green-dim); letter-spacing: .1em; text-transform: uppercase; margin-bottom: 12px; font-weight: 600; }
+    .empty-note { color: var(--green-dim); font-size: .85rem; text-align: center; padding: 20px 0; }
   </style>
 </head>
 <body>
 <div id="root"></div>
 
-<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-<script type="text/babel">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
+<script type="text/babel" data-presets="react">
 
 const { useState, useCallback, useEffect } = React;
 
@@ -182,11 +197,30 @@ const CATEGORIES = [
   { id: "recovery",  label: "Recovery",   icon: "🌿" },
 ];
 
+// 1–5 shot rating (5 = best). Composite points are centred on 3 (neutral),
+// so a "3" neither helps nor hurts the performance score.
 const RATINGS = [
-  { id: "good",    label: "Good",    value:  1, color: "#4ade80", bg: "#052e16" },
-  { id: "average", label: "Average", value:  0, color: "#fbbf24", bg: "#1c1005" },
-  { id: "poor",    label: "Poor",    value: -1, color: "#f87171", bg: "#1c0505" },
+  { id: "1", label: "1", desc: "Poor",  value: -2, color: "#f87171", bg: "#1c0505" },
+  { id: "2", label: "2", desc: "Weak",  value: -1, color: "#fb923c", bg: "#1c0f05" },
+  { id: "3", label: "3", desc: "OK",    value:  0, color: "#fbbf24", bg: "#1c1005" },
+  { id: "4", label: "4", desc: "Good",  value:  1, color: "#a3e4a0", bg: "#0c2412" },
+  { id: "5", label: "5", desc: "Great", value:  2, color: "#4ade80", bg: "#052e16" },
 ];
+
+// Map legacy good/average/poor data onto the new 1–5 scale.
+const LEGACY_RATING = { good: "5", average: "3", poor: "1", "1": "1", "2": "2", "3": "3", "4": "4", "5": "5" };
+function migrateHole(h) {
+  return {
+    par: h.par || 4,
+    score: h.score == null ? "" : h.score,
+    shots: (h.shots || []).map(s => ({ cat: s.cat, rating: LEGACY_RATING[s.rating] || "3" })),
+  };
+}
+
+function ratingValue(id) {
+  const r = RATINGS.find(r => r.id === id);
+  return r ? r.value : 0;
+}
 
 function holeModifier(score, par) {
   const d = score - par;
@@ -199,44 +233,58 @@ function holeModifier(score, par) {
 }
 
 function calcHoleScore(h) {
-  const shotPts = h.shots.reduce((a, s) => a + RATINGS.find(r => r.id === s.rating).value, 0);
+  const shotPts = h.shots.reduce((a, s) => a + ratingValue(s.rating), 0);
   const sNum = parseInt(h.score);
   const modPts = (!isNaN(sNum) && h.par) ? holeModifier(sNum, h.par).pts : 0;
   return { shotPts, modPts, total: shotPts + modPts };
 }
 
+// Roll a round's holes up into total points / strokes / par.
+function roundTotals(holes) {
+  let total = 0, strokes = 0, par = 0;
+  holes.forEach(h => {
+    total += calcHoleScore(h).total;
+    const n = parseInt(h.score);
+    if (!isNaN(n)) { strokes += n; par += h.par; }
+  });
+  return { total, strokes, par, vsPar: strokes > 0 ? strokes - par : null };
+}
+
 const emptyHole = () => ({ par: 4, score: "", shots: [] });
 
 const STORAGE_KEY = "fairway_round";
+const HISTORY_KEY = "fairway_history";
 
 function loadState() {
   try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || null; } catch { return null; }
 }
+function loadHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch { return []; }
+}
+function persistHistory(list) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list)); } catch {}
+}
+
+const barColorAvg = avg => avg >= 4 ? "#4ade80" : avg >= 3 ? "#a3e4a0" : avg >= 2 ? "#fbbf24" : "#f87171";
+const fmtSigned = n => (n >= 0 ? "+" : "") + n;
 
 function csvEscape(v) {
   const s = v == null ? "" : String(v);
   return /[",\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
 }
 
-function buildRoundCSV(courseName, holes, totalHoles) {
+function buildRoundCSV(courseName, holes, totalHoles, dateISO) {
   const rows = [];
-  let strokes = 0, par = 0, total = 0;
-  holes.forEach(h => {
-    const hs = calcHoleScore(h);
-    total += hs.total;
-    const n = parseInt(h.score);
-    if (!isNaN(n)) { strokes += n; par += h.par; }
-  });
-  const vsPar = strokes > 0 ? (strokes - par >= 0 ? "+" : "") + (strokes - par) : "";
-  const totalStr = total >= 0 ? "+" + total : String(total);
+  const { total, strokes, par } = roundTotals(holes);
+  const vsPar = strokes > 0 ? fmtSigned(strokes - par) : "";
 
   rows.push(["Course", courseName || ""]);
-  rows.push(["Date", new Date().toISOString()]);
+  rows.push(["Date", dateISO || new Date().toISOString()]);
   rows.push(["Holes", totalHoles]);
   rows.push(["Total Strokes", strokes || ""]);
   rows.push(["Total Par", par || ""]);
   rows.push(["Vs Par", vsPar]);
-  rows.push(["Total Points", totalStr]);
+  rows.push(["Total Points", fmtSigned(total)]);
   rows.push([]);
 
   rows.push(["Hole Summary"]);
@@ -250,58 +298,92 @@ function buildRoundCSV(courseName, holes, totalHoles) {
   rows.push([]);
 
   rows.push(["Shot Detail"]);
-  rows.push(["Hole", "Shot", "Category", "Rating", "Points"]);
+  rows.push(["Hole", "Shot", "Category", "Rating (1-5)", "Points"]);
   holes.forEach((h, i) => {
     h.shots.forEach((s, j) => {
       const cat = CATEGORIES.find(c => c.id === s.cat);
-      const rating = RATINGS.find(r => r.id === s.rating);
-      rows.push([
-        i + 1,
-        j + 1,
-        cat ? cat.label : s.cat,
-        rating ? rating.label : s.rating,
-        rating ? rating.value : 0,
-      ]);
+      rows.push([i + 1, j + 1, cat ? cat.label : s.cat, s.rating, ratingValue(s.rating)]);
     });
+  });
+  rows.push([]);
+
+  // Per-category average rating — handy for accumulating stats over time.
+  rows.push(["Category Averages"]);
+  rows.push(["Category", "Avg Rating (1-5)", "Shots"]);
+  const cats = {};
+  CATEGORIES.forEach(c => { cats[c.id] = { sum: 0, total: 0 }; });
+  holes.forEach(h => h.shots.forEach(s => {
+    const n = parseInt(s.rating);
+    if (!isNaN(n) && cats[s.cat]) { cats[s.cat].sum += n; cats[s.cat].total++; }
+  }));
+  CATEGORIES.forEach(c => {
+    const s = cats[c.id];
+    if (s.total > 0) rows.push([c.label, (s.sum / s.total).toFixed(2), s.total]);
   });
 
   return rows.map(r => r.map(csvEscape).join(",")).join("\r\n");
 }
 
-function roundFilename(courseName) {
-  const date = new Date().toISOString().slice(0, 10);
+function roundFilename(courseName, dateISO) {
+  const date = (dateISO || new Date().toISOString()).slice(0, 10);
   const safe = (courseName || "Round").replace(/[^a-z0-9]+/gi, "-").replace(/^-+|-+$/g, "") || "Round";
   return `Fairway-${safe}-${date}.csv`;
 }
 
+async function shareCSV(courseName, holes, totalHoles, dateISO) {
+  const csv = buildRoundCSV(courseName, holes, totalHoles, dateISO);
+  const filename = roundFilename(courseName, dateISO);
+  const file = new File([csv], filename, { type: "text/csv" });
+
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: filename });
+      return;
+    } catch (err) {
+      if (err && err.name === "AbortError") return;
+    }
+  }
+  const url = URL.createObjectURL(file);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function App() {
-  const [screen,        setScreen]        = useState("setup");
-  const [courseName,    setCourseName]    = useState("");
-  const [totalHoles,    setTotalHoles]    = useState(18);
-  const [holes,         setHoles]         = useState(() => Array.from({ length: 18 }, emptyHole));
-  const [currentHole,   setCurrentHole]   = useState(0);
-  const [selectedCat,   setSelectedCat]   = useState(null);
-  const [selectedRating,setSelectedRating]= useState(null);
-  const [savedAlert,    setSavedAlert]    = useState(false);
+  const [screen,         setScreen]         = useState("setup");
+  const [courseName,     setCourseName]     = useState("");
+  const [totalHoles,     setTotalHoles]     = useState(18);
+  const [holes,          setHoles]          = useState(() => Array.from({ length: 18 }, emptyHole));
+  const [currentHole,    setCurrentHole]    = useState(0);
+  const [selectedCat,    setSelectedCat]    = useState(null);
+  const [selectedRating, setSelectedRating] = useState(null);
+  const [history,        setHistory]        = useState(() => loadHistory());
+  const [savedRoundId,   setSavedRoundId]   = useState(null); // id of the round saved to history this session
+  const [historyView,    setHistoryView]    = useState(null); // a saved round record being viewed read-only
 
   // Restore in-progress round on load
   useEffect(() => {
     const saved = loadState();
-    if (saved) {
+    if (saved && saved.holes) {
       setCourseName(saved.courseName || "");
       setTotalHoles(saved.totalHoles || 18);
-      setHoles(saved.holes);
+      setHoles(saved.holes.map(migrateHole));
       setCurrentHole(saved.currentHole || 0);
+      setSavedRoundId(saved.savedRoundId || null);
       setScreen("hole");
     }
   }, []);
 
-  // Persist state whenever holes change
+  // Persist in-progress round whenever it changes
   useEffect(() => {
     if (screen === "hole") {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ courseName, totalHoles, holes, currentHole }));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ courseName, totalHoles, holes, currentHole, savedRoundId }));
     }
-  }, [holes, screen]);
+  }, [holes, currentHole, screen]);
 
   const startRound = () => {
     const h = Array.from({ length: totalHoles }, emptyHole);
@@ -309,6 +391,8 @@ function App() {
     setCurrentHole(0);
     setSelectedCat(null);
     setSelectedRating(null);
+    setSavedRoundId(null);
+    setHistoryView(null);
     localStorage.removeItem(STORAGE_KEY);
     setScreen("hole");
   };
@@ -328,70 +412,100 @@ function App() {
 
   const removeShot = idx => updateHole("shots", hole.shots.filter((_, i) => i !== idx));
 
-  const navigate = dir => {
-    const next = currentHole + dir;
-    if (next >= 0 && next < totalHoles) {
-      setCurrentHole(next);
-      setSelectedCat(null);
-      setSelectedRating(null);
-    }
+  const goToHole = i => {
+    setCurrentHole(i);
+    setSelectedCat(null);
+    setSelectedRating(null);
   };
 
+  const navigate = dir => {
+    const next = currentHole + dir;
+    if (next >= 0 && next < totalHoles) goToHole(next);
+  };
+
+  // Save (or update) the round in history, then show the summary.
   const finishRound = () => {
+    const hasData = holes.some(h => h.score !== "" || h.shots.length > 0);
+    if (hasData) {
+      const snapshot = JSON.parse(JSON.stringify(holes));
+      setHistory(prev => {
+        let list;
+        if (savedRoundId && prev.some(r => r.id === savedRoundId)) {
+          list = prev.map(r => r.id === savedRoundId
+            ? { ...r, courseName, totalHoles, holes: snapshot }
+            : r);
+        } else {
+          const id = savedRoundId || Date.now();
+          if (!savedRoundId) setSavedRoundId(id);
+          const rec = { id, date: new Date().toISOString(), courseName, totalHoles, holes: snapshot };
+          list = [rec, ...prev];
+        }
+        persistHistory(list);
+        return list;
+      });
+    }
     localStorage.removeItem(STORAGE_KEY);
+    setHistoryView(null);
     setScreen("summary");
   };
 
-  const exportRound = async () => {
-    const csv = buildRoundCSV(courseName, holes, totalHoles);
-    const filename = roundFilename(courseName);
-    const file = new File([csv], filename, { type: "text/csv" });
-
-    if (navigator.canShare && navigator.canShare({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: filename });
-        return;
-      } catch (err) {
-        if (err && err.name === "AbortError") return;
-      }
-    }
-
-    const url = URL.createObjectURL(file);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  const deleteRound = (id, e) => {
+    if (e) e.stopPropagation();
+    if (!window.confirm("Delete this round from history?")) return;
+    setHistory(prev => {
+      const list = prev.filter(r => r.id !== id);
+      persistHistory(list);
+      return list;
+    });
   };
 
-  // ── SUMMARY DATA ──
-  const computeSummary = () => {
+  const viewRound = rec => { setHistoryView(rec); setScreen("summary"); };
+
+  // ── SUMMARY DATA (works for the live round or a saved record) ──
+  const computeSummary = (hs0) => {
     let shotPtsTotal = 0, modPtsTotal = 0, strokes = 0, par = 0;
     const cats = {};
-    CATEGORIES.forEach(c => { cats[c.id] = { decent: 0, total: 0 }; });
-    holes.forEach(h => {
+    CATEGORIES.forEach(c => { cats[c.id] = { sum: 0, total: 0 }; });
+    hs0.forEach(h => {
       const hs = calcHoleScore(h);
       shotPtsTotal += hs.shotPts;
       modPtsTotal  += hs.modPts;
       const n = parseInt(h.score);
       if (!isNaN(n)) { strokes += n; par += h.par; }
       h.shots.forEach(s => {
-        cats[s.cat].total++;
-        if (s.rating !== "poor") cats[s.cat].decent++;
+        const rn = parseInt(s.rating);
+        if (!isNaN(rn) && cats[s.cat]) { cats[s.cat].sum += rn; cats[s.cat].total++; }
       });
     });
     return { total: shotPtsTotal + modPtsTotal, shotPtsTotal, modPtsTotal, strokes, par, cats };
   };
 
-  const barColor = pct => pct >= 75 ? "#4ade80" : pct >= 50 ? "#a3e4a0" : pct >= 30 ? "#fbbf24" : "#f87171";
+  // ── AGGREGATE STATS across all saved rounds ──
+  const aggregateStats = () => {
+    const cats = {};
+    CATEGORIES.forEach(c => { cats[c.id] = { sum: 0, total: 0 }; });
+    let totalSum = 0, vsParSum = 0, vsParRounds = 0;
+    history.forEach(rec => {
+      const t = roundTotals(rec.holes);
+      totalSum += t.total;
+      if (t.vsPar != null) { vsParSum += t.vsPar; vsParRounds++; }
+      rec.holes.forEach(h => h.shots.forEach(s => {
+        const rn = parseInt(s.rating);
+        if (!isNaN(rn) && cats[s.cat]) { cats[s.cat].sum += rn; cats[s.cat].total++; }
+      }));
+    });
+    return {
+      rounds: history.length,
+      avgScore: history.length ? totalSum / history.length : 0,
+      avgVsPar: vsParRounds ? vsParSum / vsParRounds : null,
+      cats,
+    };
+  };
 
   const scoreNum = parseInt(hole.score);
   const modifier = (!isNaN(scoreNum) && hole.par) ? holeModifier(scoreNum, hole.par) : null;
   const canAdd   = selectedCat && selectedRating;
   const hs       = calcHoleScore(hole);
-  const summary  = screen === "summary" ? computeSummary() : null;
 
   // ════════════════════════════════════════════════════════
   // SETUP SCREEN
@@ -421,6 +535,11 @@ function App() {
           </div>
         </div>
         <button className="btn btn-primary" onClick={startRound}>Start Round →</button>
+        {history.length > 0 && (
+          <button className="btn btn-secondary" onClick={() => setScreen("history")}>
+            📊 History & Stats ({history.length})
+          </button>
+        )}
       </div>
     </div>
   );
@@ -432,7 +551,7 @@ function App() {
     <div className="app">
       <div className="header">
         <div className="header-title">{courseName || "Round in Progress"}</div>
-        <div className="header-sub">Log shots after each hole</div>
+        <div className="header-sub">Tap a dot or ‹ › to move between holes</div>
       </div>
       <div className="screen-body">
 
@@ -450,8 +569,8 @@ function App() {
         <div className="progress-dots">
           {holes.map((h, i) => (
             <div key={i}
-              className={`dot ${i === currentHole ? "current" : h.score !== "" ? "complete" : ""}`}
-              onClick={() => { setCurrentHole(i); setSelectedCat(null); setSelectedRating(null); }} />
+              className={`dot ${i === currentHole ? "current" : (h.score !== "" || h.shots.length > 0) ? "complete" : ""}`}
+              onClick={() => goToHole(i)} />
           ))}
         </div>
 
@@ -472,7 +591,7 @@ function App() {
               Your Score
               {modifier && (
                 <span className="mod-badge" style={{ color: modifier.color, borderColor: modifier.color }}>
-                  {modifier.label} {modifier.pts >= 0 ? "+" : ""}{modifier.pts}pts
+                  {modifier.label} {fmtSigned(modifier.pts)}pts
                 </span>
               )}
             </label>
@@ -496,7 +615,7 @@ function App() {
             ))}
           </div>
 
-          <label className="label">Rating</label>
+          <label className="label">Shot Rating</label>
           <div className="rating-row">
             {RATINGS.map(r => (
               <button key={r.id} className="rating-btn"
@@ -506,11 +625,12 @@ function App() {
                   background: selectedRating === r.id ? r.bg : "transparent",
                 }}
                 onClick={() => setSelectedRating(selectedRating === r.id ? null : r.id)}>
-                {r.label}<br />
-                <span style={{ fontSize: ".72rem", opacity: .7 }}>{r.value > 0 ? "+" : ""}{r.value}</span>
+                <span className="rating-num">{r.label}</span>
+                <span className="rating-desc">{r.desc}</span>
               </button>
             ))}
           </div>
+          <div className="scale-hint"><span>1 · Worst</span><span>Best · 5</span></div>
 
           <button className="btn btn-primary" disabled={!canAdd} onClick={addShot}>+ Add Shot</button>
 
@@ -518,13 +638,13 @@ function App() {
             <div className="shots-log">
               {hole.shots.map((s, i) => {
                 const cat = CATEGORIES.find(c => c.id === s.cat);
-                const rat = RATINGS.find(r => r.id === s.rating);
+                const rat = RATINGS.find(r => r.id === s.rating) || RATINGS[2];
                 return (
                   <div key={i} className="shot-entry">
-                    <span className="shot-entry-left">{cat.icon} {cat.label}</span>
+                    <span className="shot-entry-left">{cat ? cat.icon : "•"} {cat ? cat.label : s.cat}</span>
                     <span className="shot-badge"
                       style={{ color: rat.color, background: rat.bg, border: `1px solid ${rat.color}44` }}>
-                      {rat.label} {rat.value >= 0 ? "+" : ""}{rat.value}
+                      {rat.label}
                     </span>
                     <button className="remove-btn" onClick={() => removeShot(i)}>✕</button>
                   </div>
@@ -541,12 +661,12 @@ function App() {
               <div>
                 <div className="label" style={{ marginBottom: 4 }}>Hole Score</div>
                 <div className="preview-detail">
-                  <span>Shots: {hs.shotPts >= 0 ? "+" : ""}{hs.shotPts}</span>
-                  <span>Modifier: {hs.modPts >= 0 ? "+" : ""}{hs.modPts}</span>
+                  <span>Shots: {fmtSigned(hs.shotPts)}</span>
+                  <span>Modifier: {fmtSigned(hs.modPts)}</span>
                 </div>
               </div>
               <div className="preview-pts" style={{ color: hs.total >= 0 ? "#4ade80" : "#f87171" }}>
-                {hs.total >= 0 ? "+" : ""}{hs.total}
+                {fmtSigned(hs.total)}
               </div>
             </div>
           </div>
@@ -556,128 +676,237 @@ function App() {
           ? <button className="btn btn-primary" onClick={() => navigate(1)}>Next Hole →</button>
           : <button className="btn btn-primary" onClick={finishRound}>Finish Round ✓</button>
         }
-        <button className="btn btn-secondary" onClick={() => setScreen("setup")}>← New Round</button>
+        <button className="btn btn-secondary" onClick={finishRound}>Finish &amp; View Summary</button>
+        <button className="btn btn-secondary" onClick={() => setScreen("setup")}>← Menu</button>
       </div>
     </div>
   );
 
   // ════════════════════════════════════════════════════════
-  // SUMMARY SCREEN
+  // SUMMARY SCREEN (live round or a saved record)
   // ════════════════════════════════════════════════════════
-  if (screen === "summary" && summary) return (
-    <div className="app">
-      <div className="header">
-        <div className="header-title">Round Summary</div>
-        <div className="header-sub">{courseName || "Performance Report"}</div>
-      </div>
-      <div className="screen-body">
-
-        <div className="score-hero">
-          <div className="label" style={{ marginBottom: 6 }}>Total Performance Score</div>
-          <div className="score-big" style={{ color: summary.total >= 0 ? "#a3e4a0" : "#f87171" }}>
-            {summary.total >= 0 ? "+" : ""}{summary.total}
-          </div>
-          <div className="score-breakdown">
-            <div>
-              <div className="score-mini-val" style={{ color: "#60a5fa" }}>
-                {summary.strokes > 0 ? (summary.strokes - summary.par >= 0 ? "+" : "") + (summary.strokes - summary.par) : "—"}
-              </div>
-              <div className="score-mini-lbl">vs Par</div>
-            </div>
-            <div>
-              <div className="score-mini-val" style={{ color: "#a78bfa" }}>
-                {summary.shotPtsTotal >= 0 ? "+" : ""}{summary.shotPtsTotal}
-              </div>
-              <div className="score-mini-lbl">Shot Pts</div>
-            </div>
-            <div>
-              <div className="score-mini-val" style={{ color: "#fbbf24" }}>
-                {summary.modPtsTotal >= 0 ? "+" : ""}{summary.modPtsTotal}
-              </div>
-              <div className="score-mini-lbl">Hole Mod</div>
-            </div>
-          </div>
+  if (screen === "summary") {
+    const sHoles      = historyView ? historyView.holes : holes;
+    const sCourse     = historyView ? historyView.courseName : courseName;
+    const sTotalHoles = historyView ? historyView.totalHoles : totalHoles;
+    const sDate       = historyView ? historyView.date : null;
+    const summary     = computeSummary(sHoles);
+    return (
+      <div className="app">
+        <div className="header">
+          <div className="header-title">Round Summary</div>
+          <div className="header-sub">{sCourse || "Performance Report"}</div>
         </div>
+        <div className="screen-body">
 
-        {/* Category Breakdown */}
-        <div className="card">
-          <div className="card-title">Shot Category Quality</div>
-          <div className="section-hint">% Good + Average shots per category</div>
-          {CATEGORIES.map(cat => {
-            const s = summary.cats[cat.id];
-            if (s.total === 0) return null;
-            const pct = Math.round((s.decent / s.total) * 100);
-            const col = barColor(pct);
-            return (
-              <div key={cat.id} className="bar-row">
-                <div className="bar-name">{cat.icon} {cat.label}</div>
-                <div className="bar-wrap">
-                  <div className="bar-fill" style={{ width: `${pct}%`, background: col }} />
+          <div className="score-hero">
+            <div className="label" style={{ marginBottom: 6 }}>Total Performance Score</div>
+            <div className="score-big" style={{ color: summary.total >= 0 ? "#a3e4a0" : "#f87171" }}>
+              {fmtSigned(summary.total)}
+            </div>
+            <div className="score-breakdown">
+              <div>
+                <div className="score-mini-val" style={{ color: "#60a5fa" }}>
+                  {summary.strokes > 0 ? fmtSigned(summary.strokes - summary.par) : "—"}
                 </div>
-                <div className="bar-pct" style={{ color: col }}>{pct}%</div>
-                <div className="bar-count">{s.decent}/{s.total}</div>
+                <div className="score-mini-lbl">vs Par</div>
               </div>
-            );
-          })}
-          {CATEGORIES.every(c => summary.cats[c.id].total === 0) && (
-            <div style={{ color: "var(--green-dim)", fontSize: ".85rem" }}>No shots logged</div>
+              <div>
+                <div className="score-mini-val" style={{ color: "#a78bfa" }}>
+                  {fmtSigned(summary.shotPtsTotal)}
+                </div>
+                <div className="score-mini-lbl">Shot Pts</div>
+              </div>
+              <div>
+                <div className="score-mini-val" style={{ color: "#fbbf24" }}>
+                  {fmtSigned(summary.modPtsTotal)}
+                </div>
+                <div className="score-mini-lbl">Hole Mod</div>
+              </div>
+            </div>
+          </div>
+
+          {/* Category Breakdown */}
+          <div className="card">
+            <div className="card-title">Shot Category Quality</div>
+            <div className="section-hint">Average rating out of 5 per category</div>
+            {CATEGORIES.map(cat => {
+              const s = summary.cats[cat.id];
+              if (s.total === 0) return null;
+              const avg = s.sum / s.total;
+              const col = barColorAvg(avg);
+              return (
+                <div key={cat.id} className="bar-row">
+                  <div className="bar-name">{cat.icon} {cat.label}</div>
+                  <div className="bar-wrap">
+                    <div className="bar-fill" style={{ width: `${(avg / 5) * 100}%`, background: col }} />
+                  </div>
+                  <div className="bar-pct" style={{ color: col }}>{avg.toFixed(1)}</div>
+                  <div className="bar-count">{s.total}</div>
+                </div>
+              );
+            })}
+            {CATEGORIES.every(c => summary.cats[c.id].total === 0) && (
+              <div className="empty-note">No shots logged</div>
+            )}
+          </div>
+
+          {/* Hole by Hole */}
+          <div className="card">
+            <div className="card-title">Hole by Hole</div>
+            <table className="hole-tbl">
+              <thead>
+                <tr><th>Hole</th><th>Par</th><th>Score</th><th>Result</th><th>Pts</th></tr>
+              </thead>
+              <tbody>
+                {sHoles.map((h, i) => {
+                  const n = parseInt(h.score);
+                  const rowHs = calcHoleScore(h);
+                  const mod = (!isNaN(n) && h.par) ? holeModifier(n, h.par) : null;
+                  return (
+                    <tr key={i}>
+                      <td>{i + 1}</td>
+                      <td>{h.par}</td>
+                      <td>{h.score || "—"}</td>
+                      <td style={{ color: mod ? mod.color : "var(--green-dim)" }}>{mod ? mod.label : "—"}</td>
+                      <td style={{ color: rowHs.total >= 0 ? "#4ade80" : "#f87171" }}>
+                        {fmtSigned(rowHs.total)}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colSpan={2}>Total</td>
+                  <td>{summary.strokes || "—"}</td>
+                  <td style={{ color: "#60a5fa" }}>
+                    {summary.strokes > 0 ? fmtSigned(summary.strokes - summary.par) : "—"}
+                  </td>
+                  <td style={{ color: summary.total >= 0 ? "#4ade80" : "#f87171" }}>
+                    {fmtSigned(summary.total)}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <button className="btn btn-primary" onClick={() => shareCSV(sCourse, sHoles, sTotalHoles, sDate)}>
+            ☁ Save to Drive / Share
+          </button>
+          {historyView ? (
+            <button className="btn btn-secondary" onClick={() => { setHistoryView(null); setScreen("history"); }}>
+              ← Back to History
+            </button>
+          ) : (
+            <>
+              <button className="btn btn-secondary" onClick={() => setScreen("hole")}>
+                ← Back to Round (edit)
+              </button>
+              <button className="btn btn-secondary" onClick={() => setScreen("setup")}>
+                Menu / New Round
+              </button>
+            </>
           )}
         </div>
-
-        {/* Hole by Hole */}
-        <div className="card">
-          <div className="card-title">Hole by Hole</div>
-          <table className="hole-tbl">
-            <thead>
-              <tr><th>Hole</th><th>Par</th><th>Score</th><th>Result</th><th>Pts</th></tr>
-            </thead>
-            <tbody>
-              {holes.map((h, i) => {
-                const n = parseInt(h.score);
-                const hs = calcHoleScore(h);
-                const mod = (!isNaN(n) && h.par) ? holeModifier(n, h.par) : null;
-                return (
-                  <tr key={i}>
-                    <td>{i + 1}</td>
-                    <td>{h.par}</td>
-                    <td>{h.score || "—"}</td>
-                    <td style={{ color: mod?.color || "var(--green-dim)" }}>{mod?.label || "—"}</td>
-                    <td style={{ color: hs.total >= 0 ? "#4ade80" : "#f87171" }}>
-                      {hs.total >= 0 ? "+" : ""}{hs.total}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-            <tfoot>
-              <tr>
-                <td colSpan={2}>Total</td>
-                <td>{summary.strokes || "—"}</td>
-                <td style={{ color: "#60a5fa" }}>
-                  {summary.strokes > 0
-                    ? (summary.strokes - summary.par >= 0 ? "+" : "") + (summary.strokes - summary.par)
-                    : "—"}
-                </td>
-                <td style={{ color: summary.total >= 0 ? "#4ade80" : "#f87171" }}>
-                  {summary.total >= 0 ? "+" : ""}{summary.total}
-                </td>
-              </tr>
-            </tfoot>
-          </table>
-        </div>
-
-        <button className="btn btn-primary" onClick={exportRound}>
-          ⤴ Export / Share CSV
-        </button>
-        <button className="btn btn-secondary" onClick={() => { setScreen("setup"); localStorage.removeItem(STORAGE_KEY); }}>
-          ← New Round
-        </button>
-        <button className="btn btn-secondary" onClick={() => setScreen("hole")}>
-          Back to Round
-        </button>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // ════════════════════════════════════════════════════════
+  // HISTORY & STATS SCREEN
+  // ════════════════════════════════════════════════════════
+  if (screen === "history") {
+    const stats = aggregateStats();
+    return (
+      <div className="app">
+        <div className="header">
+          <div className="header-title">History &amp; Stats</div>
+          <div className="header-sub">{stats.rounds} round{stats.rounds === 1 ? "" : "s"} saved</div>
+        </div>
+        <div className="screen-body">
+
+          {stats.rounds === 0 ? (
+            <div className="card"><div className="empty-note">No saved rounds yet. Finish a round to see it here.</div></div>
+          ) : (
+            <>
+              <div className="card">
+                <div className="card-title">Career Averages</div>
+                <div className="score-breakdown" style={{ justifyContent: "space-around" }}>
+                  <div>
+                    <div className="score-mini-val" style={{ color: "#a3e4a0" }}>{fmtSigned(Math.round(stats.avgScore))}</div>
+                    <div className="score-mini-lbl">Avg Score</div>
+                  </div>
+                  <div>
+                    <div className="score-mini-val" style={{ color: "#60a5fa" }}>
+                      {stats.avgVsPar != null ? fmtSigned(Math.round(stats.avgVsPar)) : "—"}
+                    </div>
+                    <div className="score-mini-lbl">Avg vs Par</div>
+                  </div>
+                  <div>
+                    <div className="score-mini-val" style={{ color: "#fbbf24" }}>{stats.rounds}</div>
+                    <div className="score-mini-lbl">Rounds</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="card">
+                <div className="card-title">Category Trends</div>
+                <div className="section-hint">Average rating out of 5 — all rounds</div>
+                {CATEGORIES.map(cat => {
+                  const s = stats.cats[cat.id];
+                  if (s.total === 0) return null;
+                  const avg = s.sum / s.total;
+                  const col = barColorAvg(avg);
+                  return (
+                    <div key={cat.id} className="bar-row">
+                      <div className="bar-name">{cat.icon} {cat.label}</div>
+                      <div className="bar-wrap">
+                        <div className="bar-fill" style={{ width: `${(avg / 5) * 100}%`, background: col }} />
+                      </div>
+                      <div className="bar-pct" style={{ color: col }}>{avg.toFixed(1)}</div>
+                      <div className="bar-count">{s.total}</div>
+                    </div>
+                  );
+                })}
+                {CATEGORIES.every(c => stats.cats[c.id].total === 0) && (
+                  <div className="empty-note">No shots logged yet</div>
+                )}
+              </div>
+
+              <div className="card">
+                <div className="card-title">Saved Rounds</div>
+                {history.map(rec => {
+                  const t = roundTotals(rec.holes);
+                  const d = new Date(rec.date);
+                  const dateStr = isNaN(d) ? "" : d.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+                  return (
+                    <div key={rec.id} className="round-row" onClick={() => viewRound(rec)}>
+                      <div>
+                        <div className="round-course">{rec.courseName || "Round"}</div>
+                        <div className="round-meta">
+                          {dateStr} · {rec.totalHoles} holes
+                          {t.vsPar != null ? ` · ${fmtSigned(t.vsPar)} vs par` : ""}
+                        </div>
+                      </div>
+                      <div className="round-right">
+                        <div className="round-score" style={{ color: t.total >= 0 ? "#a3e4a0" : "#f87171" }}>
+                          {fmtSigned(t.total)}
+                        </div>
+                        <button className="del-round" onClick={e => deleteRound(rec.id, e)}>🗑</button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          <button className="btn btn-secondary" onClick={() => setScreen("setup")}>← Menu</button>
+        </div>
+      </div>
+    );
+  }
 
   return null;
 }
